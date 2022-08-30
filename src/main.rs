@@ -5,7 +5,7 @@ use std::{str::FromStr, sync::Arc};
 #[derive(Parser, Debug)]
 struct AppConfig {
     #[clap(flatten)]
-    rustkit: rustkit::config::Config,
+    rustkit: rustkit::Config,
 
     #[clap(short, long, env = "TEST_RESPONSE", default_value = "ok!")]
     response: String,
