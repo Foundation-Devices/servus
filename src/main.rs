@@ -1,13 +1,27 @@
 use axum::{extract::Path, http::StatusCode, routing::get, Router};
-use std::{net::SocketAddr, str::FromStr};
+use clap::Parser;
+use std::str::FromStr;
+
+#[derive(Parser, Debug)]
+struct AppConfig {
+    #[clap(flatten)]
+    rustkit: rustkit::config::Config,
+
+    #[clap(short, long, env = "TEST_RESPONSE", default_value = "ok!")]
+    response: String,
+}
 
 #[tokio::main]
 async fn main() {
-    let addrs: (SocketAddr, SocketAddr) =
-        (([127, 0, 0, 1], 8000).into(), ([127, 0, 0, 1], 9000).into());
+    let config = AppConfig::parse();
+    println!("config = {:?}", config);
 
     let router = Router::new().route("/:status", get(handler));
-    rustkit::http::serve(addrs, router).await;
+    rustkit::http::serve(
+        (config.rustkit.http_address, config.rustkit.metrics_address),
+        router,
+    )
+    .await;
 }
 
 async fn handler(Path(status): Path<String>) -> (StatusCode, &'static str) {
