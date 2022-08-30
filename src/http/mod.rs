@@ -1,6 +1,7 @@
 pub mod metrics;
 
 use axum::{
+    extract::Extension,
     http::{Request, StatusCode},
     middleware::{self, Next},
     response::Response,
@@ -14,10 +15,15 @@ use tokio::time::Instant;
 // Creates two instances of a `hyper::Server`, one for application routes, and another for metrics
 // output. The separate server for metrics prevents incoming connections from accessing
 // that route, keeping it internal to the deployed environment.
-pub async fn serve(addrs: (SocketAddr, SocketAddr), router: Router) {
+pub async fn serve<S>(addrs: (SocketAddr, SocketAddr), state: S, router: Router)
+where
+    S: Send + Sync + Clone + 'static,
+{
     // create primary application router and server,
-    // apply default middleware
-    let r = router.layer(middleware::from_fn(metrics_middleware));
+    // applying handler state and default middleware
+    let r = router
+        .layer(Extension(state))
+        .layer(middleware::from_fn(metrics_middleware));
 
     let app = Server::bind(&addrs.0)
         .serve(r.into_make_service())

@@ -1,6 +1,6 @@
-use axum::{extract::Path, http::StatusCode, routing::get, Router};
+use axum::{extract::Extension, extract::Path, http::StatusCode, routing::get, Router};
 use clap::Parser;
-use std::str::FromStr;
+use std::{str::FromStr, sync::Arc};
 
 #[derive(Parser, Debug)]
 struct AppConfig {
@@ -16,15 +16,20 @@ async fn main() {
     let config = AppConfig::parse();
     println!("config = {:?}", config);
 
+    let state = Arc::new(config.response.clone());
     let router = Router::new().route("/:status", get(handler));
     rustkit::http::serve(
         (config.rustkit.http_address, config.rustkit.metrics_address),
+        state,
         router,
     )
     .await;
 }
 
-async fn handler(Path(status): Path<String>) -> (StatusCode, &'static str) {
+async fn handler(
+    Extension(state): Extension<Arc<String>>,
+    Path(status): Path<String>,
+) -> (StatusCode, String) {
     let status = StatusCode::from_str(&status).unwrap();
-    (status, "ok!")
+    (status, state.to_string())
 }
