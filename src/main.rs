@@ -1,5 +1,6 @@
-use axum::{extract::Extension, extract::Path, http::StatusCode, routing::get, Router};
-use clap::Parser;
+use rustkit::axum::{extract::Extension, extract::Path, http::StatusCode, routing::get, Router};
+use rustkit::clap::Parser;
+use rustkit::tokio;
 use std::{str::FromStr, sync::Arc};
 
 #[derive(Parser, Debug)]
@@ -14,7 +15,6 @@ struct AppConfig {
 #[tokio::main]
 async fn main() {
     let config = AppConfig::parse();
-    println!("config = {:?}", config);
 
     let state = Arc::new(config.response.clone());
     let router = Router::new().route("/:status", get(handler));
