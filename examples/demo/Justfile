@@ -1,0 +1,15 @@
+setup-db:
+    @ echo "[starting postgres]"
+    @ docker-compose up -d
+
+    @ echo "[wait for postgres to be ready...]"
+    @ sleep 5
+
+    @ echo "[running migrations]"
+    @ DATABASE_URL=postgres://demo:demo@localhost/demo sqlx migrate run
+
+post-message author message:
+    hurl --color --variable author="{{author}}" --variable message="{{message}}" post.hurl
+
+get-messages:
+    hurl get.hurl | jq .

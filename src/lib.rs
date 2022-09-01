@@ -2,13 +2,15 @@
 pub use axum;
 pub use clap;
 pub use prometheus;
+pub use serde;
+pub use serde_json;
+pub use sqlx;
 pub use tokio;
 pub use tracing;
-
-use std::net::SocketAddr;
-
 // internal module exports
 pub mod http;
+
+use std::net::SocketAddr;
 
 #[derive(clap::Args, Debug)]
 pub struct Config {
@@ -33,10 +35,12 @@ pub struct Config {
         default_value_t = false
     )]
     pub log_json: bool,
+
+    #[clap(long = "rustkit-database-url", env = "RUSTKIT_DATABASE_URL")]
+    pub database_url: Option<String>,
 }
 
 pub fn init(config: &Config) {
-    println!("{:?}", config);
     if config.log_json {
         tracing_subscriber::fmt().json().init();
     } else {
