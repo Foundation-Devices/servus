@@ -1,15 +1,9 @@
 pub mod metrics;
 
-use axum::{
-    extract::Extension,
-    http::{Request, StatusCode},
-    middleware::{self, Next},
-    response::Response,
-    routing, Router, Server,
-};
-use prometheus::{Encoder, TextEncoder};
+use axum::{extract::Extension, middleware, routing, Router, Server};
 use std::net::SocketAddr;
-use tokio::time::Instant;
+use tower_http::trace::{DefaultMakeSpan, TraceLayer};
+use tracing::Level;
 
 // Entrypoint for serving HTTP requests.
 // Creates two instances of a `hyper::Server`, one for application routes, and another for metrics
@@ -20,17 +14,24 @@ where
     S: Send + Sync + Clone + 'static,
 {
     // create primary application router and server,
-    // applying handler state and default middleware
+    // applying handler state, default middleware, and tracing
     let r = router
         .layer(Extension(state))
-        .layer(middleware::from_fn(metrics_middleware));
+        .layer(middleware::from_fn(metrics::middleware))
+        .layer(
+            TraceLayer::new_for_http().make_span_with(
+                DefaultMakeSpan::new()
+                    .level(Level::TRACE)
+                    .include_headers(true),
+            ),
+        );
 
     let app = Server::bind(&addrs.0)
         .serve(r.into_make_service())
         .with_graceful_shutdown(shutdown_signal());
 
     // create metrics router and server
-    let r = Router::new().route("/metrics", routing::get(metrics_handler));
+    let r = Router::new().route("/metrics", routing::get(metrics::handler));
 
     let metrics = Server::bind(&addrs.1)
         .serve(r.into_make_service())
@@ -45,31 +46,4 @@ where
 
 async fn shutdown_signal() {
     tokio::signal::ctrl_c().await.expect("setup ctrl-c signal");
-}
-
-async fn metrics_middleware<B>(req: Request<B>, next: Next<B>) -> Result<Response, StatusCode> {
-    let method = String::from(req.method().as_str());
-    let path = String::from(req.uri().path());
-
-    let start = Instant::now();
-    let resp = next.run(req).await;
-    let end = Instant::now();
-
-    // record HTTP metric(s)
-    metrics::HTTP_REQUEST_DURATION
-        .with_label_values(&[&method, &path, resp.status().as_str()])
-        .observe(end.duration_since(start).as_secs_f64());
-
-    Ok(resp)
-}
-
-// write metrics from default prometheus register
-async fn metrics_handler() -> String {
-    let mut buffer = Vec::new();
-    let encoder = TextEncoder::new();
-
-    let metrics = prometheus::gather();
-    encoder.encode(&metrics, &mut buffer).unwrap();
-
-    String::from_utf8(buffer.clone()).unwrap()
 }
