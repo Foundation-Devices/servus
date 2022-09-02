@@ -37,8 +37,11 @@ where
         .serve(r.into_make_service())
         .with_graceful_shutdown(shutdown_signal());
 
-    // wait on both server instances,
-    // returning early if one results in an error
+    // spawn each server instance (so they can be scheduled on separate threads as necessary)
+    // and wait on their join handles, returning early if one reports an error
+    let app = tokio::spawn(app);
+    let metrics = tokio::spawn(metrics);
+
     if let Err(e) = tokio::try_join!(app, metrics) {
         println!("server error = {}", e);
     }
