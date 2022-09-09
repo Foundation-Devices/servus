@@ -3,7 +3,7 @@ pub mod metrics;
 use axum::{extract::Extension, http::StatusCode, middleware, routing, Router, Server};
 use std::net::SocketAddr;
 use tower_http::trace::{DefaultMakeSpan, TraceLayer};
-use tracing::Level;
+use tracing::{error, Level};
 
 // Entrypoint for serving HTTP requests.
 // Creates two instances of a `hyper::Server`, one for application routes, and another for metrics
@@ -45,7 +45,7 @@ where
     let metrics = tokio::spawn(metrics);
 
     if let Err(e) = tokio::try_join!(app, metrics) {
-        println!("server error = {}", e);
+        error!("server error = {}", e);
     }
 }
 

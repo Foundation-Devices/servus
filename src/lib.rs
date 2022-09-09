@@ -6,11 +6,14 @@ pub use serde;
 pub use serde_json;
 pub use sqlx;
 pub use tokio;
+pub use tower;
+pub use tower_http;
 pub use tracing;
 // internal module exports
 pub mod http;
 
 use std::net::SocketAddr;
+use tracing_subscriber::EnvFilter;
 
 #[derive(clap::Args, Debug)]
 pub struct Config {
@@ -42,8 +45,14 @@ pub struct Config {
 
 pub fn init(config: &Config) {
     if config.log_json {
-        tracing_subscriber::fmt().json().init();
+        tracing_subscriber::fmt()
+            .with_env_filter(EnvFilter::from_default_env())
+            .json()
+            .init();
     } else {
-        tracing_subscriber::fmt().compact().init();
+        tracing_subscriber::fmt()
+            .with_env_filter(EnvFilter::from_default_env())
+            .compact()
+            .init();
     }
 }
