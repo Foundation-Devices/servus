@@ -1,7 +1,7 @@
-rustkit-demo
+servus-demo
 ============
 
-Simple example showing how to utilize `rustkit`.
+Simple example showing how to utilize `servus`.
 
 # Setup
 
@@ -38,7 +38,7 @@ just examples/demo/setup-db
 Then, run the demo server,
 
 ```sh
-cargo run --example demo -- --rustkit-database-url postgres://demo:demo@localhost/demo
+cargo run --example demo -- --servus-database-url postgres://demo:demo@localhost/demo
 ```
 
 In another window, make requests against the server. One will `POST` messages, and the other will `GET` all of them.

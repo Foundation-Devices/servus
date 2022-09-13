@@ -18,28 +18,28 @@ use tracing_subscriber::EnvFilter;
 #[derive(clap::Args, Debug)]
 pub struct Config {
     #[clap(
-        long = "rustkit-http-address",
-        env = "RUSTKIT_HTTP_ADDRESS",
+        long = "servus-http-address",
+        env = "SERVUS_HTTP_ADDRESS",
         default_value = "0.0.0.0:8000"
     )]
     pub http_address: SocketAddr,
 
     #[clap(
-        long = "rustkit-metrics-address",
-        env = "RUSTKIT_METRICS_ADDRESS",
+        long = "servus-metrics-address",
+        env = "SERVUS_METRICS_ADDRESS",
         default_value = "0.0.0.0:9000"
     )]
     pub metrics_address: SocketAddr,
 
     #[clap(
-        long = "rustkit-log-json",
-        env = "RUSTKIT_LOG_JSON",
+        long = "servus-log-json",
+        env = "SERVUS_LOG_JSON",
         value_parser,
         default_value_t = false
     )]
     pub log_json: bool,
 
-    #[clap(long = "rustkit-database-url", env = "RUSTKIT_DATABASE_URL")]
+    #[clap(long = "servus-database-url", env = "SERVUS_DATABASE_URL")]
     pub database_url: Option<String>,
 }
 

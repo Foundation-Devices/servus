@@ -1,7 +1,9 @@
 [package]
-name = "rustkit"
+name = "servus"
 version = "0.1.0"
 edition = "2021"
+description = "Common Rust library for developing backend services at Foundation"
+readme = "README.md"
 authors = [
     "Foundation Devices <hello@foundationdevices.com>",
 ]

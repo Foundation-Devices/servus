@@ -1,22 +1,22 @@
-use rustkit::axum::{
+use servus::axum::{
     extract::{self, Extension},
     http::StatusCode,
     response::IntoResponse,
     routing::{get, post},
     Json, Router,
 };
-use rustkit::clap::Parser;
-use rustkit::serde;
-use rustkit::serde_json::json;
-use rustkit::sqlx;
-use rustkit::tokio;
-use rustkit::tracing::{error, info};
+use servus::clap::Parser;
+use servus::serde;
+use servus::serde_json::json;
+use servus::sqlx;
+use servus::tokio;
+use servus::tracing::{error, info};
 use std::sync::Arc;
 
 #[derive(Parser, Debug)]
 struct AppConfig {
     #[clap(flatten)]
-    rustkit: rustkit::Config,
+    servus: servus::Config,
 
     #[clap(short, long, env = "TEST_RESPONSE", default_value = "ok!")]
     response: String,
@@ -37,9 +37,9 @@ async fn main() -> anyhow::Result<()> {
     // parse CLI config
     let config = AppConfig::parse();
     // setup logging
-    rustkit::init(&config.rustkit);
+    servus::init(&config.servus);
 
-    let state = if let Some(url) = &config.rustkit.database_url {
+    let state = if let Some(url) = &config.servus.database_url {
         // if we have a database URL, create a connection pool
         // we assume migrations have already been applied
         Arc::new(AppState::new(
@@ -47,7 +47,7 @@ async fn main() -> anyhow::Result<()> {
         ))
     } else {
         // this typically would be handled in some kind of validation step on the config,
-        // which rustkit cannot define, as it would be application-dependent
+        // which servus cannot define, as it would be application-dependent
         return Err(anyhow::anyhow!("database url is needed for this demo!"));
     };
 
@@ -55,8 +55,8 @@ async fn main() -> anyhow::Result<()> {
         .route("/message", post(post_message))
         .route("/message/all", get(get_messages));
 
-    rustkit::http::serve(
-        (config.rustkit.http_address, config.rustkit.metrics_address),
+    servus::http::serve(
+        (config.servus.http_address, config.servus.metrics_address),
         state,
         router,
     )
