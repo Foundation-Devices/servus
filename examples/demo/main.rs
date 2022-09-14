@@ -56,9 +56,10 @@ async fn main() -> anyhow::Result<()> {
         .route("/message/all", get(get_messages));
 
     servus::http::serve(
-        (config.servus.http_address, config.servus.metrics_address),
-        state,
+        config.servus.http_address,
+        Some(config.servus.metrics_address),
         router,
+        state,
     )
     .await;
 

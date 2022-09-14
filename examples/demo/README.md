@@ -1,7 +1,8 @@
 servus-demo
 ============
 
-Simple example showing how to utilize `servus`.
+Simple example showing how to utilize `servus`. This example includes database connectivity with Postgres and
+shared state for handler functions.
 
 # Setup
 

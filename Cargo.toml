@@ -11,6 +11,9 @@ authors = [
 [[example]]
 name = "demo"
 
+[[example]]
+name = "echo"
+
 [dependencies]
 axum = { version = "0.6.0-rc.1", features = ["json"] }
 clap = { version = "3", features = ["derive", "env"] }
