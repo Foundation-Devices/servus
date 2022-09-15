@@ -9,4 +9,4 @@ To view the crate documentation, run `cargo doc --no-deps --open` in the root of
 
 ## LICENSE
 
-GNU Affero General Public License v3.0
+GNU Affero General Public License v3.0 (SPDX: AGPL-3.0)

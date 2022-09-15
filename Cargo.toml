@@ -7,6 +7,7 @@ readme = "README.md"
 authors = [
     "Foundation Devices <hello@foundationdevices.com>",
 ]
+license = "AGPL-3.0"
 
 [[example]]
 name = "demo"
