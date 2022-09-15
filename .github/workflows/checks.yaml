@@ -1,0 +1,15 @@
+# SPDX-FileCopyrightText: 2022 Foundation Devices Inc. <hello@foundationdevices.com>
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+name: checks
+on: [push]
+jobs:
+  license:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: REUSE compliance
+        uses: fsfe/reuse-action@v1
