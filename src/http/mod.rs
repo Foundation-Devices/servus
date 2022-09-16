@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2022 Foundation Devices Inc. <hello@foundationdevices.com>
+//
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 //! Common HTTP functionality, applied to all services using `servus`.
 //!
 //! This module has one public function `serve`.

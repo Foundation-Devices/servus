@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2022 Foundation Devices Inc. <hello@foundationdevices.com>
+//
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 //! `servus` is a library of common structures and functions for building backend web services in Rust.
 //! By bringing together a set of great libraries and exposing a thin layer, it hopes to eliminate common boilerplate
 //! code needed in production-ready backend services, such as HTTP routing, SQL connectivity, metrics, and logging.
