@@ -44,7 +44,7 @@ pub async fn serve<S>(
     // applying handler state if we have it, and default metrics/tracing middleware
     let r = router
         .layer(Extension(state))
-        .layer(middleware::from_fn(metrics::middleware))
+        .route_layer(middleware::from_fn(metrics::middleware)) // only record matched routes
         .layer(
             TraceLayer::new_for_http().make_span_with(
                 DefaultMakeSpan::new()
