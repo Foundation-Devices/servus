@@ -12,7 +12,6 @@ use servus::axum::{
 use servus::clap::Parser;
 use servus::serde;
 use servus::serde_json::json;
-use servus::sqlx;
 use servus::tokio;
 use servus::tracing::{error, info};
 use std::sync::Arc;
