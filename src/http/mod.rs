@@ -8,7 +8,7 @@
 
 pub mod metrics;
 
-use axum::{extract::Extension, http::StatusCode, middleware, routing, Router, Server};
+use axum::{http::StatusCode, middleware, routing, Router, Server};
 use std::net::SocketAddr;
 use tower_http::trace::{DefaultMakeSpan, TraceLayer};
 use tracing::{error, Level};
@@ -35,7 +35,7 @@ use tracing::{error, Level};
 pub async fn serve<S>(
     http_address: SocketAddr,
     metrics_address: Option<SocketAddr>,
-    router: Router,
+    router: Router<S>,
     state: S,
 ) where
     S: Send + Sync + Clone + 'static,
@@ -43,7 +43,7 @@ pub async fn serve<S>(
     // create primary application router and server
     // applying handler state if we have it, and default metrics/tracing middleware
     let r = router
-        .layer(Extension(state))
+        .with_state(state)
         .route_layer(middleware::from_fn(metrics::middleware)) // only record matched routes
         .layer(
             TraceLayer::new_for_http().make_span_with(

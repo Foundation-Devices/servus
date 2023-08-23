@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use servus::axum::{
-    extract::{self, Extension},
+    extract::{self, State},
     http::StatusCode,
     response::IntoResponse,
     routing::{get, post},
@@ -76,7 +76,7 @@ struct Message {
 }
 
 async fn post_message(
-    Extension(state): Extension<Arc<AppState>>,
+    State(state): State<Arc<AppState>>,
     extract::Json(payload): extract::Json<Message>,
 ) -> StatusCode {
     info!(
@@ -100,7 +100,7 @@ async fn post_message(
     StatusCode::OK
 }
 
-async fn get_messages(Extension(state): Extension<Arc<AppState>>) -> impl IntoResponse {
+async fn get_messages(State(state): State<Arc<AppState>>) -> impl IntoResponse {
     info!(message = "got get messages request!");
 
     let q = sqlx::query!("select * from guestbook")
