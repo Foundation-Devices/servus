@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 use servus::axum::{
-    extract::{self, State},
+    extract::{self, Extension},
     http::StatusCode,
     response::IntoResponse,
     routing::{get, post},
@@ -25,6 +25,7 @@ struct AppConfig {
     response: String,
 }
 
+#[derive(Clone)]
 struct AppState {
     pool: sqlx::postgres::PgPool,
 }
@@ -56,13 +57,13 @@ async fn main() -> anyhow::Result<()> {
 
     let router = Router::new()
         .route("/message", post(post_message))
-        .route("/message/all", get(get_messages));
+        .route("/message/all", get(get_messages))
+        .layer(Extension(state));
 
     servus::http::serve(
         config.servus.http_address,
         Some(config.servus.metrics_address),
         router,
-        state,
     )
     .await;
 
@@ -76,7 +77,7 @@ struct Message {
 }
 
 async fn post_message(
-    State(state): State<Arc<AppState>>,
+    Extension(state): Extension<Arc<AppState>>,
     extract::Json(payload): extract::Json<Message>,
 ) -> StatusCode {
     info!(
@@ -88,7 +89,7 @@ async fn post_message(
     if let Err(e) = sqlx::query!(
         "INSERT INTO guestbook (author, message) VALUES ($1, $2)",
         payload.author,
-        payload.message
+        payload.message,
     )
     .execute(&state.pool)
     .await
@@ -100,7 +101,7 @@ async fn post_message(
     StatusCode::OK
 }
 
-async fn get_messages(State(state): State<Arc<AppState>>) -> impl IntoResponse {
+async fn get_messages(Extension(state): Extension<Arc<AppState>>) -> impl IntoResponse {
     info!(message = "got get messages request!");
 
     let q = sqlx::query!("select * from guestbook")

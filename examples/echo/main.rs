@@ -25,7 +25,7 @@ async fn main() -> anyhow::Result<()> {
     // Note, we pass the `metrics_address` parameter value as `None` to imply we don't want to
     // start the metrics server. Also, the `state` parameter is the unit type `()`, meaning we have
     // no global state and all handlers are stateless.
-    servus::http::serve(config.servus.http_address, None, router, ()).await;
+    servus::http::serve(config.servus.http_address, None, router).await;
 
     Ok(())
 }

@@ -32,18 +32,14 @@ use tracing::{error, Level};
 ///
 /// Both the application server and metrics server will respond to a CTRL-C shutdown signal and
 /// terminate gracefully.
-pub async fn serve<S>(
+pub async fn serve(
     http_address: SocketAddr,
     metrics_address: Option<SocketAddr>,
-    router: Router<S>,
-    state: S,
-) where
-    S: Send + Sync + Clone + 'static,
-{
+    router: Router<()>,
+) {
     // create primary application router and server
     // applying handler state if we have it, and default metrics/tracing middleware
-    let r = router
-        .with_state(state)
+    let router = router
         .route_layer(middleware::from_fn(metrics::middleware)) // only record matched routes
         .layer(
             TraceLayer::new_for_http().make_span_with(
@@ -54,17 +50,17 @@ pub async fn serve<S>(
         );
 
     let app = Server::bind(&http_address)
-        .serve(r.into_make_service())
+        .serve(router.into_make_service())
         .with_graceful_shutdown(shutdown_signal());
 
     if let Some(metrics_address) = metrics_address {
         // create metrics router and server, also used for healthcheck
-        let r = Router::new()
+        let router = Router::new()
             .route("/metrics", routing::get(metrics::handler))
             .route("/health", routing::get(health));
 
         let metrics = Server::bind(&metrics_address)
-            .serve(r.into_make_service())
+            .serve(router.into_make_service())
             .with_graceful_shutdown(shutdown_signal());
 
         // spawn each server instance (so they can be scheduled on separate threads as necessary)
