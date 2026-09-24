@@ -34,4 +34,4 @@ tracing-subscriber = { version = "0.3", features = ["fmt", "std", "json", "env-f
 
 [dev-dependencies]
 anyhow = "1"
-sqlx = { version = "0.7", features = ["runtime-tokio-native-tls", "postgres", "time"] }
+sqlx = { version = "0.8.1", features = ["runtime-tokio-native-tls", "postgres", "time"] }
